@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+
+# Environment
+.env
+venv/
+.env.local
+.env.*.local
+
+# Streamlit cache
+.streamlit/
+
+# Vector store
+vector_store/
+
+# Build folders
+.dist/
+
+# OS files
+.DS_Store
