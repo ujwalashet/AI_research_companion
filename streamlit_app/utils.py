@@ -115,50 +115,46 @@ def research_topic(topic: str) -> Optional[Dict]:
         return None
 
 def generate_mindmap(content: str) -> str:
-    """
-    Generate mindmap from content
-    
-    Args:
-        content: Content to generate mindmap from
-        
-    Returns:
-        Mindmap string or empty string on error
-    """
     try:
         response = requests.post(
             f"{API_BASE_URL}/generate_mindmap",
-            json={"content": content},
+            data={"text": content},   # <-- FORM data, not JSON
             timeout=60
         )
         response.raise_for_status()
-        result = response.json()
-        return result.get("mindmap", "")
+        return response.json().get("mindmap", "")
     except Exception as e:
         st.error(f"❌ Error generating mindmap: {str(e)}")
         return ""
 
+
 def upload_to_rag(content: str, metadata: Optional[Dict] = None) -> bool:
     """
-    Upload content to RAG system
-    
-    Args:
-        content: Content to upload
-        metadata: Optional metadata dict
-        
-    Returns:
-        True if successful, False otherwise
+    Upload content to RAG system via temp file
     """
+
     try:
+        # create a temporary file because backend expects UploadFile
+        temp_file = "temp_rag.txt"
+        with open(temp_file, "w", encoding="utf-8") as f:
+            f.write(content)
+
+        files = {
+            "file": ("rag.txt", open(temp_file, "rb"), "text/plain")
+        }
+
         response = requests.post(
             f"{API_BASE_URL}/upload_to_rag",
-            json={"content": content, "metadata": metadata or {}},
+            files=files,
             timeout=60
         )
         response.raise_for_status()
         return True
+
     except Exception as e:
         st.error(f"❌ Error uploading to RAG: {str(e)}")
         return False
+
 
 def rag_chat(question: str) -> str:
     """

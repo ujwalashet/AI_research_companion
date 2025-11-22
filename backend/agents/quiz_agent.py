@@ -1,11 +1,43 @@
 from langchain_openai import ChatOpenAI
+import json
 
 def generate_quiz(summary_text):
     """
-    Uses LangChain to create quiz questions and answers based on the summary.
+    Generate quiz in list format:
+    [
+        {
+            "question": "...",
+            "options": ["A","B","C","D"],
+            "answer": "B"
+        },
+        ...
+    ]
     """
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
+    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.4)
 
-    prompt = f"Create 3 multiple-choice quiz questions with answers from the following summary:\n\n{summary_text}"
-    response = llm.invoke(prompt)
-    return response.content
+    prompt = f"""
+    Create exactly 3 multiple-choice questions from this summary:
+
+    {summary_text}
+
+    Return the result STRICTLY in this JSON format only:
+
+    [
+      {{
+        "question": "text?",
+        "options": ["A","B","C","D"],
+        "answer": "correct option value"
+      }}
+    ]
+
+    Do NOT include explanations. Do NOT include text outside JSON.
+    """
+
+    response = llm.invoke(prompt).content
+
+    # Try converting the output to proper JSON
+    try:
+        quiz = json.loads(response)
+        return quiz
+    except:
+        return []

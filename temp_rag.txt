@@ -1,0 +1,206 @@
+Agentic AI 10-Day Crash Course (Intermediate
+Level)
+🎯 Course Objective
+This 10-day crash course helps you understand Agentic AI systems — AI agents that can plan, reason, and
+act autonomously. By the end, you’ll build your own  Personal Study Assistant Agent using Python,
+LangChain, and OpenAI.
+🧭 Table of Contents
+Introduction to Agentic AI
+LLM Fundamentals
+Prompt Engineering for Agents
+LangChain Basics
+Memory Systems
+Multi-Agent Collaboration (CrewAI)
+Planning and Reasoning Loops
+Project Setup
+Project Code Walkthrough
+Deployment + Resume/GitHub Integration
+📅 Day 1: Introduction to Agentic AI
+Concepts:
+What is Agentic AI?
+Agentic AI refers to intelligent systems capable of autonomous decision-making and action.
+Components:
+LLM (Large Language Model) — brain of the agent.
+Memory — allows the agent to recall previous steps.
+Tools/Environment — APIs, databases, or code execution tools.
+Example:
+Chatbot: “What is the weather in Delhi?” → replies with the answer.
+Agent: “What’s the weather in Delhi, and should I carry an umbrella?” → searches, reasons, and provides an
+actionable response.
+1. 
+2. 
+3. 
+4. 
+5. 
+6. 
+7. 
+8. 
+9. 
+10. 
+• 
+• 
+• 
+• 
+• 
+• 
+1
+Study Material:
+OpenAI Docs: Introduction to Agents
+YouTube: “What are AI Agents?” by LangChain (10-min intro)
+📅 Day 2: LLM Fundamentals
+Concepts:
+Tokens: Small pieces of words processed by models.
+Temperature: Controls randomness in output.
+Top_p: Controls diversity of responses.
+Context Window: Maximum number of tokens a model can remember.
+Python Example:
+from openai import OpenAI
+client = OpenAI()
+response = client.chat.completions.create(
+model="gpt-4o-mini",
+messages=[{"role": "user", "content": "Explain what an AI agent does in 3 
+lines."}]
+)
+print(response.choices[0].message.content)
+📅 Day 3: Prompt Engineering for Agents
+Concepts:
+System Prompts: Define the agent’s behavior.
+Role Prompting: Assigns a role like “You are a planner.”
+Chain-of-Thought Prompts: Encourage step-by-step reasoning.
+Example:
+prompt = """You are a planning assistant. Break down how to organize a 3-hour 
+study session into focused tasks."""
+Study:
+Prompt Engineering Guide
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+2
+📅 Day 4: LangChain Basics
+Concepts:
+Chains: Link LLMs and tools together.
+Agents: Dynamically decide what action to take next.
+Tools: Functions or APIs used by agents.
+Example Code:
+from langchain.agents import initialize_agent, load_tools
+from langchain.llms import OpenAI
+llm = OpenAI(temperature=0)
+tools = load_tools(["serpapi", "llm-math"], llm=llm)
+agent = initialize_agent(tools, llm, agent="zero-shot-react-description",
+verbose=True)
+response = agent.run("What is 25% of 240?")
+print(response)
+📅 Day 5: Adding Memory
+Concepts:
+Short-term Memory: Stores recent messages.
+Long-term Memory: Uses vector databases for persistence.
+Example Code:
+from langchain.memory import ConversationBufferMemory
+memory = ConversationBufferMemory()
+memory.save_context({"input": "Hello"}, {"output": "Hi there!"})
+print(memory.load_memory_variables({}))
+Study:
+LangChain docs → Memory section
+• 
+• 
+• 
+• 
+• 
+• 
+3
+📅 Day 6: Multi-Agent Collaboration (CrewAI)
+Concepts:
+CrewAI: Enables multiple agents with roles to collaborate.
+Agents can pass tasks and data between each other.
+Example:
+Two agents: 1. Researcher Agent → Collects data. 2. Writer Agent → Summarizes into reports.
+Explore: CrewAI GitHub Repo
+📅 Day 7: Planning & Reasoning Loops
+Concepts:
+Agents follow plan → act → observe → improve cycle.
+Reflection improves agent accuracy.
+Example Prompt:
+prompt = """You are an autonomous agent. Plan how to study AI for 3 days. After 
+planning, reflect on what could go wrong and fix it."""
+Study:
+Research "ReAct (Reason + Act) Framework" for Agents
+📅 Day 8: Project Setup – Personal Study Assistant Agent
+Goal:
+Build an AI agent that: - Accepts your subjects and goals - Creates a daily study plan - Motivates you with
+summaries
+Setup Steps:
+Install dependencies: 
+pip install openai langchain
+• 
+• 
+• 
+• 
+• 
+1. 
+4
+Set up your API key: 
+export OPENAI_API_KEY="your_api_key_here"
+Create a file named study_agent.py
+📅 Day 9: Project Code Walkthrough
+Example Code:
+from langchain import OpenAI, LLMChain, PromptTemplate
+llm = OpenAI(temperature=0.7)
+prompt = PromptTemplate(
+input_variables=["subject", "hours"],
+template="""You are a study planner AI. Create a {hours}-hour study plan 
+for {subject} with focus, break, and revision periods."""
+)
+chain = LLMChain(llm=llm, prompt=prompt)
+subject = input("Enter the subject: ")
+hours = input("Enter available hours: ")
+print("\nGenerated Plan:\n")
+print(chain.run({"subject": subject, "hours": hours}))
+Output Example:
+Generated Plan:
+1. 0-1 hr: Read core concepts
+2. 1-1.5 hr: Practice key problems
+3. 1.5-2 hr: Break
+4. 2-3 hr: Revise + summarize
+2. 
+3. 
+5
+📅 Day 10: Deployment + Resume Integration
+Deploy:
+You can run the agent locally or deploy on: - Streamlit: For a quick web interface - Gradio: For interactive
+app demo
+Resume Line Example:
+Built  a  Personal  Study  Assistant  Agent  using  LangChain  and  OpenAI  APIs,  capable  of
+generating adaptive study plans using autonomous reasoning and prompt-driven logic.
+GitHub Setup:
+Create a repo named Agentic-AI-Study-Agent
+Add README.md  with project description and screenshots
+Include the study_agent.py  code
+Next Steps:
+Explore LangGraph for visual multi-agent workflows
+Try building a Web Research Agent next!
+✅ Summary Checklist
+[x] Understood what Agentic AI is
+[x] Practiced prompt engineering
+[x] Learned LangChain basics
+[x] Implemented memory and planning
+[x] Built a working personal agent
+You’re now ready to explore advanced multi-agent systems and start contributing to open-source Agentic
+AI projects!
+1. 
+2. 
+3. 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+6

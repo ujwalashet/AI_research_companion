@@ -73,7 +73,6 @@ def research_topic(topic: str = Form(...)):
     }
 @app.post("/upload_pdf")
 async def upload_pdf(file: UploadFile = File(...)):
-    # Step 1: Read PDF
     pdf_bytes = await file.read()
     pdf_doc = fitz.open(stream=pdf_bytes, filetype="pdf")
 
@@ -82,56 +81,51 @@ async def upload_pdf(file: UploadFile = File(...)):
     for page in pdf_doc:
         extracted_text += page.get_text()
 
-    # Step 2: Summarize the extracted text
     summary = summarize_text("PDF Content", extracted_text)
-
-    # Step 3: Generate quiz
     quiz = generate_quiz(summary)
 
-    # Step 4: Save to MongoDB
     save_report(file.filename, summary, quiz)
 
     return {
         "filename": file.filename,
+        "extracted_content": extracted_text,
         "summary": summary,
         "quiz": quiz
     }
 
+
 @app.post("/upload_image")
 async def upload_image(file: UploadFile = File(...)):
-    import base64
+    """
+    Extract text from image using Tesseract OCR + generate summary + quiz.
+    """
 
-    # Read image bytes
+    # Step 1: Read image
     image_bytes = await file.read()
+    image = Image.open(io.BytesIO(image_bytes))
 
-    # Convert to base64 string
-    encoded_image = base64.b64encode(image_bytes).decode("utf-8")
+    # Step 2: Extract text with Tesseract OCR
+    try:
+        extracted_text = pytesseract.image_to_string(image)
+    except Exception as e:
+        return {"error": f"OCR failed: {str(e)}"}
 
-    # Send request to OpenAI Vision model
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": "Describe this image in detail and extract any text from it."},
-                    {
-                        "type": "image_url",
-                        "image_url": {
-                            "url": f"data:image/jpeg;base64,{encoded_image}"
-                        }
-                    }
-                ]
-            }
-        ]
-    )
+    # Step 3: Summarize the extracted text
+    summary = summarize_text("Image OCR Content", extracted_text)
 
-    vision_output = response.choices[0].message.content
+    # Step 4: Generate quiz
+    quiz = generate_quiz(summary)
+
+    # Step 5: Save to mongoDB
+    save_report(file.filename, summary, quiz)
 
     return {
         "filename": file.filename,
-        "description": vision_output
+        "extracted_text": extracted_text,
+        "summary": summary,
+        "quiz": quiz
     }
+
 @app.post("/upload_text")
 async def upload_text(text: str = Form(...)):
     """
@@ -256,3 +250,13 @@ def rag_chat(question: str):
         "score": result["score"],
         "context_used": context
     }
+@app.post("/upload_text_to_rag")
+async def upload_text_to_rag(text: str = Form(...)):
+    store_document_in_vector_db(text, "text_input")
+    return {"message": "Text stored in vector DB!"}
+
+@app.get("/debug_quiz")
+def debug_quiz():
+    summary = "This is a test summary about AI."
+    quiz = generate_quiz(summary)
+    return {"quiz": quiz}
