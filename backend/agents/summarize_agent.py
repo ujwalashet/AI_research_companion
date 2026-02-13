@@ -1,11 +1,21 @@
-from langchain_openai import ChatOpenAI
+from transformers import pipeline
+
+summarizer = pipeline(
+    "summarization",
+    model="facebook/bart-large-cnn"
+)
 
 def summarize_text(topic, context_text):
-    """
-    Uses LangChain + OpenAI to summarize text into a detailed explanation.
-    """
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
+    if not context_text or len(context_text.strip()) == 0:
+        return "No content found to summarize."
 
-    prompt = f"Summarize the following information about {topic} in around 10 lines:\n\n{context_text}"
-    response = llm.invoke(prompt)
-    return response.content
+    context_text = context_text[:3000]
+
+    summary = summarizer(
+        context_text,
+        max_length=150,
+        min_length=60,
+        do_sample=False
+    )
+
+    return summary[0]["summary_text"]
